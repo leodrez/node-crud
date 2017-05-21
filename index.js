@@ -1,63 +1,72 @@
 const express = require('express');
-const bodyParser = require('body-parser');
-const mongo = require('mongodb').MongoClient
-  , assert = require('assert');
 const app = express();
+const MongoClient = require('mongodb').MongoClient
+  , assert = require('assert');
+const bodyParser = require('body-parser');
 
-app.set('view engine', 'handlebars');
+const url = 'mongodb://localhost:27017/nodepractice';
 
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-
-const url = 'mongodb://localhost:27017/nodecrud'; 
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
-app.get('/', (req, res, next) => {
-  let resultArray = [];
-  mongo.connect(url, (err, db) => {
-    assert.equal(null, err);
-    
-    let cursor = db.collection('data').find();
+app.get('/submit', (req, res) => {
+  res.sendFile(__dirname + '/views/submit.html');
+});
 
-    cursor.forEach((doc, err) => {
-      assert.equal(null, err); 
-      resultArray.push(doc);
-    }, () => {
-      db.close();
+app.get('/form', (req, res) => {
+});
+
+app.get('/data', (req, res) => {
+  MongoClient.connect(url, (err, db) => {
+    assert.equal(null, err);
+    if (err) res.status(500).send({ success: false, message: 'Failed to connect to db' });
+
+    db.collection('userdata').find({}).toArray((err, docs) => {
+      assert.equal(null, err);
+      console.log(docs);
     });
+    
+    db.close();
   });
 });
 
-app.post('/', (req, res, next) => {
-  let item = {
-    name: req.body.name,
-    email: req.body.email,
-    topic: req.body.topic,
-    message: req.body.message
-  };
-
-  mongo.connect(url, (err, db) => {
+app.post('/form', (req, res) => {
+  MongoClient.connect(url, (err, db) => {
     assert.equal(null, err);
-    db.collection('data').insertOne(item, (err, data) => {
+    console.log('Connected to db');
+
+    let data = {
+       name: req.body.name,
+       email: req.body.email,
+       topic: req.body.topic,
+       message: req.body.message 
+    };
+    
+    db.collection('userdata').insertOne(data, (err, result) => {
       assert.equal(null, err);
-      console.log('Item inserted');
-      
-      db.close();
+      console.log('Item inserted successfully'); 
     });
-  });  
 
-  res.redirect('/');
+    db.close();
+    res.redirect('/submit');
+  });
 });
 
-app.put('/', (req, res) => {
+app.put('/form', (req, res) => {
+  MongoClient.connect(url, (err, db) => {
+    assert.equal(null, err);
+    console.log('Connected to db');
+
+    db.close();
+    //res.redirect('/update');
+  });
 });
 
-app.delete('/', (req, res) => {
-});
+app.delete('/', (req, res) => {});
 
-app.listen(3000, () => {
-  console.log('Server listening on port 3000');
-});
+app.listen(3000, () => { console.log('App listening on port 3000'); });
+
