@@ -38,7 +38,7 @@ app.post('/data', (req, res) => {
     
   MongoClient.connect(url, (err, db) => {
     assert.equal(null, err);
-    console.log('Connected to db');
+    if (err) res.status(500);
 
     db.collection('userdata').insertOne(data, (err, result) => {
       assert.equal(null, err);
@@ -61,8 +61,9 @@ app.put('/data/:id', (req, res) => {
 
   MongoClient.connect(url, (err, db) => {
     assert.equal(null, err);
+    if (err) res.status(500);
 
-    db.collection('userdata').updateOne({"_id": ObjectId(id)}, {$set: data}, ((err, result) => {
+    db.collection('userdata').updateOne({'_id': ObjectId(id)}, {$set: data}, ((err, result) => {
       assert.equal(null, err);
       res.send(data);
     }));
@@ -76,6 +77,7 @@ app.delete('/data/:id', (req, res) => {
 
   MongoClient.connect(url, (err, db) => {
     assert.equal(null, err);
+    if (err) res.status(500);
 
     db.collection('userdata').deleteOne({'_id': ObjectId(id)}, ((err, result) => {
       assert.equal(null, err);
