@@ -23,7 +23,7 @@ app.get('/form', (req, res) => {
 app.get('/data', (req, res) => {
   MongoClient.connect(url, (err, db) => {
     assert.equal(null, err);
-    if (err) res.status(500).send({ success: false, message: 'Failed to connect to db' });
+    if (err) res.status(500);
 
     db.collection('userdata').find({}).toArray((err, docs) => {
       assert.equal(null, err);
@@ -40,10 +40,10 @@ app.post('/form', (req, res) => {
     console.log('Connected to db');
 
     let data = {
-       name: req.body.name,
-       email: req.body.email,
-       topic: req.body.topic,
-       message: req.body.message 
+      name: req.body.name,
+      email: req.body.email,
+      topic: req.body.topic,
+      message: req.body.message
     };
     
     db.collection('userdata').insertOne(data, (err, result) => {
