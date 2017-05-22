@@ -27,7 +27,7 @@ app.get('/data', (req, res) => {
 
     db.collection('userdata').find({}).toArray((err, docs) => {
       assert.equal(null, err);
-      console.log(docs);
+      res.send(docs);
     });
     
     db.close();
@@ -48,11 +48,10 @@ app.post('/form', (req, res) => {
     
     db.collection('userdata').insertOne(data, (err, result) => {
       assert.equal(null, err);
-      console.log('Item inserted successfully'); 
+      res.send(data);
     });
 
     db.close();
-    res.redirect('/submit');
   });
 });
 
