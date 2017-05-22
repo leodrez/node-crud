@@ -10,15 +10,8 @@ const url = 'mongodb://localhost:27017/nodepractice';
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
-});
-
 app.get('/submit', (req, res) => {
-  res.sendFile(__dirname + '/views/submit.html');
-});
-
-app.get('/form', (req, res) => {
+  res.sendFile(__dirname + '/index.html');
 });
 
 app.get('/data', (req, res) => {
@@ -35,7 +28,7 @@ app.get('/data', (req, res) => {
   });
 });
 
-app.post('/form', (req, res) => {
+app.post('/data', (req, res) => {
   let data = {
     name: req.body.name,
     email: req.body.email,
@@ -56,7 +49,7 @@ app.post('/form', (req, res) => {
   });
 });
 
-app.put('/form/:id', (req, res) => {
+app.put('/data/:id', (req, res) => {
   let data = {
     name: req.body.name,
     email: req.body.email,
@@ -78,7 +71,7 @@ app.put('/form/:id', (req, res) => {
   });
 });
 
-app.delete('/form/:id', (req, res) => {
+app.delete('/data/:id', (req, res) => {
   let id = req.params.id
 
   MongoClient.connect(url, (err, db) => {
