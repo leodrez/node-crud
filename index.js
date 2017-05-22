@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const MongoClient = require('mongodb').MongoClient
   , assert = require('assert');
+const ObjectId = require('mongodb').ObjectID;
 const bodyParser = require('body-parser');
 
 const url = 'mongodb://localhost:27017/nodepractice';
@@ -35,17 +36,17 @@ app.get('/data', (req, res) => {
 });
 
 app.post('/form', (req, res) => {
+  let data = {
+    name: req.body.name,
+    email: req.body.email,
+    topic: req.body.topic,
+    message: req.body.message
+  };
+    
   MongoClient.connect(url, (err, db) => {
     assert.equal(null, err);
     console.log('Connected to db');
 
-    let data = {
-      name: req.body.name,
-      email: req.body.email,
-      topic: req.body.topic,
-      message: req.body.message
-    };
-    
     db.collection('userdata').insertOne(data, (err, result) => {
       assert.equal(null, err);
       res.send(data);
@@ -55,17 +56,43 @@ app.post('/form', (req, res) => {
   });
 });
 
-app.put('/form', (req, res) => {
+app.put('/form/:id', (req, res) => {
+  let data = {
+    name: req.body.name,
+    email: req.body.email,
+    topic: req.body.topic,
+    message: req.body.message,
+  };
+
+  let id = req.params.id
+
   MongoClient.connect(url, (err, db) => {
     assert.equal(null, err);
-    console.log('Connected to db');
+
+    db.collection('userdata').updateOne({"_id": ObjectId(id)}, {$set: data}, ((err, result) => {
+      assert.equal(null, err);
+      res.send(data);
+    }));
 
     db.close();
-    //res.redirect('/update');
   });
 });
 
-app.delete('/', (req, res) => {});
+app.delete('/form/:id', (req, res) => {
+  let id = req.params.id
+
+  MongoClient.connect(url, (err, db) => {
+    assert.equal(null, err);
+
+    db.collection('userdata').deleteOne({'_id': ObjectId(id)}, ((err, result) => {
+      assert.equal(null, err);
+      res.send({ message: 'Deleted successfully' });
+    }));
+
+    db.close();
+  });
+  
+});
 
 app.listen(3000, () => { console.log('App listening on port 3000'); });
 
