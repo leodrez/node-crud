@@ -29,6 +29,10 @@ app.get('/', (req, res) => {
   });
 });
 
+app.get('/submit', (req, res) => {
+  res.render(__dirname + '/views/home.handlebars');
+});
+
 app.post('/submit', (req, res) => {
   let data = {
     name: req.body.name,
