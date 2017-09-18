@@ -4,31 +4,32 @@ const MongoClient = require('mongodb').MongoClient
   , assert = require('assert');
 const ObjectId = require('mongodb').ObjectID;
 const bodyParser = require('body-parser');
+const hbs = require('express-handlebars');
 
 const url = 'mongodb://localhost:27017/nodepractice';
 
+app.engine('handlebars', hbs({defaultLayout: 'main'}));
+app.set('view engine', 'handlebars');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.get('/submit', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
-});
-
-app.get('/data', (req, res) => {
+app.get('/', (req, res) => {
   MongoClient.connect(url, (err, db) => {
     assert.equal(null, err);
     if (err) res.status(500);
 
     db.collection('userdata').find({}).toArray((err, docs) => {
       assert.equal(null, err);
-      res.send(docs);
+      res.render('data', {
+        data: docs
+      });
     });
     
     db.close();
   });
 });
 
-app.post('/data', (req, res) => {
+app.post('/submit', (req, res) => {
   let data = {
     name: req.body.name,
     email: req.body.email,
